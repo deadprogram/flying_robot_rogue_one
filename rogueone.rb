@@ -45,16 +45,8 @@ class Rogueone < ArduinoSketch
     serial_println current_command_value
     servo_refresh
     vectoring_servo.position current_command_value
-    #servo_delay(1000)
   end
-  
-  def servo_delay(t)
-    t.times do
-      delay 1
-      servo_refresh
-    end
-  end
-  
+    
   def rudder
     serial_print "Rudder command - direction:"
     serial_print current_command_direction
