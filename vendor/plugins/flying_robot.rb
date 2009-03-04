@@ -16,6 +16,19 @@ class FlyingRobot < ArduinoPlugin
   
   add_to_setup "current_command_received_complete = false;"
   
+  # current elevator values
+  external_variables "char current_elevator_direction[1]"
+  external_variables "int current_elevator_deflection = 0"
+  
+  # current rudder values
+  external_variables "char current_rudder_direction[1]"
+  external_variables "int current_rudder_deflection = 0"
+  
+  # current throttle values
+  external_variables "char current_throttle_direction[1]"
+  external_variables "int current_throttle_speed = 0"
+    
+  
   void be_flying_robot(){}
   
   boolean current_command_received_is_complete() {
@@ -97,6 +110,15 @@ class FlyingRobot < ArduinoPlugin
         current_command_length++ ;
       }
     }
+  }
+  
+  // used to echo the commands being received via serial
+  void print_current_command(const char* cmd) {
+    Serial.print(cmd);
+    Serial.print(" command - direction:");
+    Serial.print(current_command_direction());
+    Serial.print(" value:");
+    Serial.println(current_command_value());    
   }
   
   void dispatch_command() {

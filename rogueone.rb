@@ -12,15 +12,11 @@ class Rogueone < ArduinoSketch
   @right_motor = "3, byte"
   @forward = "1, byte"
   @reverse = "0, byte"
-  
+    
   output_pin 13, :as => :led
   
   # xbee used for communication with ground station
   serial_begin :rate => 9600
-  
-  # one-time setup
-  def setup
-  end
   
   # main command loop, required for any arduino program
   def loop
@@ -39,22 +35,18 @@ class Rogueone < ArduinoSketch
   end
   
   def elevators
-    serial_print "Elevators command - direction:"
-    serial_print current_command_direction
-    serial_print " value:"
-    serial_println current_command_value
+    print_current_command("Elevators")
     servo_refresh
     vectoring_servo.position current_command_value
   end
     
   def rudder
-    serial_print "Rudder command - direction:"
-    serial_print current_command_direction
-    serial_print " value:"
-    serial_println current_command_value
+    print_current_command("Rudder")
   end
   
   def throttle
+    print_current_command("Throttle")
+    
     mc_init(main_thrusters_reset)
     if current_command_direction == 'f'
       mc_send_command(main_thrusters, @left_motor, @forward, current_command_value)
@@ -64,11 +56,6 @@ class Rogueone < ArduinoSketch
       mc_send_command(main_thrusters, @left_motor, @reverse, current_command_value)
       mc_send_command(main_thrusters, @right_motor, @reverse, current_command_value)
     end
-    
-    serial_print "Throttle command - direction:"
-    serial_print current_command_direction
-    serial_print " value:"
-    serial_println current_command_value
   end
     
   def instruments
