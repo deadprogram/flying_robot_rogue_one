@@ -135,14 +135,20 @@ class FlyingRobot < ArduinoPlugin
     } else if (cmd == 'e') {
       parse_direction_code();
       parse_command_value(4);
+      current_elevator_direction[0] = current_command_direction();
+      current_elevator_deflection = current_command_value();
       elevators();
     } else if (cmd == 'r') { 
       parse_direction_code();
       parse_command_value(4);
+      current_rudder_direction[0] = current_command_direction();
+      current_rudder_deflection = current_command_value();
       rudder();
     } else if (cmd == 't') {
       parse_direction_code();
       parse_command_value(4);
+      current_throttle_direction[0] = current_command_direction();
+      current_throttle_speed = current_command_value();
       throttle();
     } else if (cmd == 'i') {    
       parse_instrument_code();

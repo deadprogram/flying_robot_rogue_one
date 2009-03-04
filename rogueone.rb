@@ -1,3 +1,8 @@
+# Rogue One - An Unmanned Aerial Vehicle that uses the flying_robot command set for Ruby Arduino Development
+# Written by Ron Evans (http://deadprogrammersociety.com) for the flying_robot project
+#
+# Heavily influenced by the Blimpduino project, thanks for the inspiration!
+#
 class Rogueone < ArduinoSketch
   # two-wire interface to HMC6352 compass module
   output_pin 19, :as => :wire, :device => :i2c, :enable => :true
