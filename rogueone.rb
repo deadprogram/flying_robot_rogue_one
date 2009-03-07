@@ -52,14 +52,14 @@ class Rogueone < ArduinoSketch
   def throttle
     print_current_command("Throttle")
     
-    mc_init(main_thrusters_reset)
+    main_thrusters_reset.mc_init
     if current_command_direction == 'f'
-      mc_send_command(main_thrusters, @left_motor, @forward, current_command_value)
-      mc_send_command(main_thrusters, @right_motor, @forward, current_command_value)
+      main_thrusters.mc_send_command(@left_motor, @forward, current_command_value)
+      main_thrusters.mc_send_command(@right_motor, @forward, current_command_value)
     end
     if current_command_direction == 'r'
-      mc_send_command(main_thrusters, @left_motor, @reverse, current_command_value)
-      mc_send_command(main_thrusters, @right_motor, @reverse, current_command_value)
+      main_thrusters.mc_send_command(@left_motor, @reverse, current_command_value)
+      main_thrusters.mc_send_command(@right_motor, @reverse, current_command_value)
     end
   end
     

@@ -1,7 +1,6 @@
-# Plugin for Ruby Arduino Development that parses the flying_robot command set from any source of input to the seriel port
+# Plugin for Ruby Arduino Development that parses the flying_robot command set from any source of input to the serial port
 # Written by Ron Evans (http://deadprogrammersociety.com) for the flying_robot project
 #
-# Based on code taken from the Pololu forums: http://forum.pololu.com/viewtopic.php?f=15&t=1102&p=4913&hilit=arduino#p4913
 class FlyingRobot < ArduinoPlugin
   # used for parsing input commands
   external_variables "bool current_command_received_complete"
