@@ -16,16 +16,16 @@ class FlyingRobot < ArduinoPlugin
   add_to_setup "current_command_received_complete = false;"
   
   # current elevator values
-  external_variables "char current_elevator_direction[1]"
-  external_variables "int current_elevator_deflection = 0"
+  external_variables "char elevator_direction[1]"
+  external_variables "int elevator_deflection = 0"
   
   # current rudder values
-  external_variables "char current_rudder_direction[1]"
-  external_variables "int current_rudder_deflection = 0"
+  external_variables "char rudder_direction[1]"
+  external_variables "int rudder_deflection = 0"
   
   # current throttle values
-  external_variables "char current_throttle_direction[1]"
-  external_variables "int current_throttle_speed = 0"
+  external_variables "char throttle_direction[1]"
+  external_variables "int throttle_speed = 0"
     
   
   void be_flying_robot(){}
@@ -48,6 +48,30 @@ class FlyingRobot < ArduinoPlugin
   
   int current_command_value() {
     return command_value ;
+  }
+  
+  char current_elevator_direction() {
+    return elevator_direction[0];
+  }
+  
+  int current_elevator_deflection() {
+    return elevator_deflection ;
+  }
+
+  char current_rudder_direction() {
+    return rudder_direction[0];
+  }
+  
+  int current_rudder_deflection() {
+    return rudder_deflection ;
+  }
+
+  char current_throttle_direction() {
+    return throttle_direction[0];
+  }
+  
+  int current_throttle_speed() {
+    return throttle_speed ;
   }
   
   void clear_command_buffer() {
@@ -134,20 +158,20 @@ class FlyingRobot < ArduinoPlugin
     } else if (cmd == 'e') {
       parse_direction_code();
       parse_command_value(4);
-      current_elevator_direction[0] = current_command_direction();
-      current_elevator_deflection = current_command_value();
+      elevator_direction[0] = current_command_direction();
+      elevator_deflection = current_command_value();
       elevators();
     } else if (cmd == 'r') { 
       parse_direction_code();
       parse_command_value(4);
-      current_rudder_direction[0] = current_command_direction();
-      current_rudder_deflection = current_command_value();
+      rudder_direction[0] = current_command_direction();
+      rudder_deflection = current_command_value();
       rudder();
     } else if (cmd == 't') {
       parse_direction_code();
       parse_command_value(4);
-      current_throttle_direction[0] = current_command_direction();
-      current_throttle_speed = current_command_value();
+      throttle_direction[0] = current_command_direction();
+      throttle_speed = current_command_value();
       throttle();
     } else if (cmd == 'i') {    
       parse_instrument_code();

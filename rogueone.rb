@@ -17,6 +17,9 @@ class Rogueone < ArduinoSketch
   @right_motor = "3, byte"
   @forward = "1, byte"
   @reverse = "0, byte"
+  @direction = "1, byte"
+  @left_motor_speed = "0, byte"
+  @right_motor_speed = "0, byte"
     
   output_pin 13, :as => :led
   
@@ -47,20 +50,12 @@ class Rogueone < ArduinoSketch
     
   def rudder
     print_current_command("Rudder")
+    set_thrusters
   end
   
   def throttle
     print_current_command("Throttle")
-    
-    main_thrusters_reset.mc_init
-    if current_command_direction == 'f'
-      main_thrusters.mc_send_command(@left_motor, @forward, current_command_value)
-      main_thrusters.mc_send_command(@right_motor, @forward, current_command_value)
-    end
-    if current_command_direction == 'r'
-      main_thrusters.mc_send_command(@left_motor, @reverse, current_command_value)
-      main_thrusters.mc_send_command(@right_motor, @reverse, current_command_value)
-    end
+    set_thrusters
   end
     
   def instruments
@@ -71,5 +66,37 @@ class Rogueone < ArduinoSketch
     serial_print "."
     serial_println heading_fractional
     #serial_println current_command_instrument
+  end
+  
+  def set_thrusters
+    if current_command_direction == 'f'
+      @direction = @forward
+    else
+      @direction = @reverse
+    end
+    
+    calculate_motor_speeds
+    main_thrusters_reset.mc_init
+    main_thrusters.mc_send_command(@left_motor, @direction, @left_motor_speed)
+    main_thrusters.mc_send_command(@right_motor, @direction, @right_motor_speed)
+  end
+  
+  def calculate_motor_speeds
+    if current_rudder_direction == 'c'
+      @left_motor_speed = current_throttle_speed
+      @right_motor_speed = current_throttle_speed
+    end
+    if current_rudder_direction == 'l'
+      @left_motor_speed = adjusted_throttle_speed
+      @right_motor_speed = current_throttle_speed
+    end
+    if current_rudder_direction == 'r'
+      @left_motor_speed = current_throttle_speed
+      @right_motor_speed = adjusted_throttle_speed
+    end
+  end
+  
+  def adjusted_throttle_speed
+    return (current_rudder_deflection / 127) * current_throttle_speed ;
   end
 end
