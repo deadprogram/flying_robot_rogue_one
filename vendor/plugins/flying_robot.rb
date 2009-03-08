@@ -13,7 +13,7 @@ class FlyingRobot < ArduinoPlugin
   external_variables "char instrument_code[1]"
   external_variables "int command_value"
   
-  add_to_setup "current_command_received_complete = false;"
+  add_to_setup "current_command_received_complete = false; elevator_direction[0] = 'c'; rudder_direction[0] = 'c'; throttle_direction[0] = 'f';"
   
   # current elevator values
   external_variables "char elevator_direction[1]"
