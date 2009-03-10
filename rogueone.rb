@@ -20,11 +20,12 @@ class Rogueone < ArduinoSketch
   @direction = "1, byte"
   @left_motor_speed = "0, byte"
   @right_motor_speed = "0, byte"
+  @deflection = "0, byte"
     
   output_pin 13, :as => :led
   
   # xbee used for communication with ground station
-  serial_begin :rate => 9600
+  serial_begin :rate => 19200
   
   # main command loop, required for any arduino program
   def loop
@@ -43,18 +44,35 @@ class Rogueone < ArduinoSketch
   end
   
   def elevators
-    print_current_command("Elevators")
+    print_current_command("Elevators", current_elevator_deflection)
+    if current_elevator_direction == 'c'
+      @deflection = 90
+    end
+    if current_elevator_direction == 'u'
+      @deflection = 90 - current_elevator_deflection
+    end
+    if current_elevator_direction == 'd'
+      @deflection = 90 + current_elevator_deflection
+    end
+
+    if @deflection < 45
+      @deflection = 45
+    end
+    if @deflection > 135
+      @deflection = 135
+    end
+    
     servo_refresh
-    vectoring_servo.position current_command_value
+    vectoring_servo.position @deflection
   end
     
   def rudder
-    print_current_command("Rudder")
+    print_current_command("Rudder", current_rudder_deflection)
     set_thrusters
   end
   
   def throttle
-    print_current_command("Throttle")
+    print_current_command("Throttle", current_throttle_speed)
     set_thrusters
   end
     
@@ -65,7 +83,6 @@ class Rogueone < ArduinoSketch
     serial_print heading
     serial_print "."
     serial_println heading_fractional
-    #serial_println current_command_instrument
   end
   
   def set_thrusters
@@ -83,20 +100,20 @@ class Rogueone < ArduinoSketch
   
   def calculate_motor_speeds
     if current_rudder_direction == 'c'
-      @left_motor_speed = current_throttle_speed
-      @right_motor_speed = current_throttle_speed
+      @left_motor_speed = current_throttle_speed / 100 * 127
+      @right_motor_speed = current_throttle_speed / 100 * 127
     end
     if current_rudder_direction == 'l'
-      @left_motor_speed = adjusted_throttle_speed
-      @right_motor_speed = current_throttle_speed
+      @left_motor_speed = adjusted_throttle_speed / 100 * 127
+      @right_motor_speed = current_throttle_speed / 100 * 127
     end
     if current_rudder_direction == 'r'
-      @left_motor_speed = current_throttle_speed
-      @right_motor_speed = adjusted_throttle_speed
+      @left_motor_speed = current_throttle_speed / 100 * 127
+      @right_motor_speed = adjusted_throttle_speed / 100 * 127
     end
   end
   
   def adjusted_throttle_speed
-    return (current_rudder_deflection / 127) * current_throttle_speed ;
+    return (current_rudder_deflection / 90) * current_throttle_speed ;
   end
 end
