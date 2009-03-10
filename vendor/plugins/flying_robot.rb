@@ -1,6 +1,25 @@
 # Plugin for Ruby Arduino Development that parses the flying_robot command set from any source of input to the serial port
 # Written by Ron Evans (http://deadprogrammersociety.com) for the flying_robot project
 #
+# In order to implement a sketch that uses the flying_robot parser, you need to implement the methods that make up its interface
+# so that it will respond to the standard command set.
+# 
+# The following commands are supported:
+# (h)ail - See if the UAV can still respond. Should send "Roger" back.
+# (s)tatus - Grab a snapshot of all instrument readings plus any other status info that the UAV can support
+# (e)levators - Set the elevators. The command supports two parameters:
+#   direction - enter 'u' for up, 'c' for centered, or 'd' for down
+#   deflection - enter an angle between 0 and 90 degrees
+# (r)udder - Set the rudder. This command supports two parameters:
+#   direction - enter 'l' for left, 'c' for centered, or 'r' for right
+#   deflection - enter an angle between 0 and 90 degrees
+# (t)hrottle - Set the throttle. This command supports two parameters:
+#   direction - enter 'f' for forward, or 'r' for reverse
+#   speed - enter a percentage from 0 to 100
+# (i)nstruments - Read the current data for one of the installed instruments on the UAV. This command supports one parameter:
+#   id - enter an integer for which instrment readings should be returned from. If there is not an instrument installed
+#        for that id 'Invalid instrument' will be returned
+#
 class FlyingRobot < ArduinoPlugin
   # used for parsing input commands
   external_variables "bool current_command_received_complete"
@@ -12,9 +31,7 @@ class FlyingRobot < ArduinoPlugin
   external_variables "char direction_code[1]"
   external_variables "char instrument_code[1]"
   external_variables "int command_value"
-  
-  add_to_setup "current_command_received_complete = false; elevator_direction[0] = 'c'; rudder_direction[0] = 'c'; throttle_direction[0] = 'f';"
-  
+    
   # current elevator values
   external_variables "char elevator_direction[1]"
   external_variables "int elevator_deflection = 0"
@@ -27,7 +44,10 @@ class FlyingRobot < ArduinoPlugin
   external_variables "char throttle_direction[1]"
   external_variables "int throttle_speed = 0"
     
+  # initialize parser vars
+  add_to_setup "current_command_received_complete = false; elevator_direction[0] = 'c'; rudder_direction[0] = 'c'; throttle_direction[0] = 'f';"
   
+  # this is a hack to get the plugin included, that I got from the twitter_connect example
   void be_flying_robot(){}
   
   boolean current_command_received_is_complete() {
@@ -136,12 +156,12 @@ class FlyingRobot < ArduinoPlugin
   }
   
   // used to echo the commands being received via serial
-  void print_current_command(const char* cmd) {
+  void print_current_command(const char* cmd, int val) {
     Serial.print(cmd);
     Serial.print(" command - direction:");
     Serial.print(current_command_direction());
     Serial.print(" value:");
-    Serial.println(current_command_value());    
+    Serial.println(val);    
   }
   
   void dispatch_command() {
@@ -160,18 +180,30 @@ class FlyingRobot < ArduinoPlugin
       parse_command_value(4);
       elevator_direction[0] = current_command_direction();
       elevator_deflection = current_command_value();
+      if (elevator_deflection > 90) {
+        elevator_deflection = 90 ;
+      }
+      
       elevators();
     } else if (cmd == 'r') { 
       parse_direction_code();
       parse_command_value(4);
       rudder_direction[0] = current_command_direction();
       rudder_deflection = current_command_value();
+      if (rudder_deflection > 90) {
+        rudder_deflection = 90 ;
+      }
+      
       rudder();
     } else if (cmd == 't') {
       parse_direction_code();
       parse_command_value(4);
       throttle_direction[0] = current_command_direction();
       throttle_speed = current_command_value();
+      if (throttle_speed > 100) {
+        throttle_speed = 100 ;
+      }
+      
       throttle();
     } else if (cmd == 'i') {    
       parse_instrument_code();
