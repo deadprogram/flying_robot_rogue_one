@@ -100,20 +100,20 @@ class Rogueone < ArduinoSketch
   
   def calculate_motor_speeds
     if current_rudder_direction == 'c'
-      @left_motor_speed = current_throttle_speed / 100 * 127
-      @right_motor_speed = current_throttle_speed / 100 * 127
+      @left_motor_speed = current_throttle_speed / 100.0 * 127
+      @right_motor_speed = current_throttle_speed / 100.0 * 127
     end
     if current_rudder_direction == 'l'
-      @left_motor_speed = adjusted_throttle_speed / 100 * 127
-      @right_motor_speed = current_throttle_speed / 100 * 127
+      @left_motor_speed = adjusted_throttle_speed / 100.0 * 127
+      @right_motor_speed = current_throttle_speed / 100.0 * 127
     end
     if current_rudder_direction == 'r'
-      @left_motor_speed = current_throttle_speed / 100 * 127
-      @right_motor_speed = adjusted_throttle_speed / 100 * 127
+      @left_motor_speed = current_throttle_speed / 100.0 * 127
+      @right_motor_speed = adjusted_throttle_speed / 100.0 * 127
     end
   end
   
   def adjusted_throttle_speed
-    return (current_rudder_deflection / 90) * current_throttle_speed ;
+    return (current_rudder_deflection / 90.0) * current_throttle_speed ;
   end
 end
