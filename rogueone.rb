@@ -104,20 +104,14 @@ class Rogueone < ArduinoSketch
     if current_rudder_direction == 'c'
       @left_motor_speed = current_throttle_speed / 100.0 * 127.0
       @right_motor_speed = current_throttle_speed / 100.0 * 127.0
-      serial_println @left_motor_speed
-      serial_println @right_motor_speed
     end
     if current_rudder_direction == 'l'
       @left_motor_speed = adjusted_throttle_speed / 10000
       @right_motor_speed = current_throttle_speed / 100.0 * 127.0
-      serial_println @left_motor_speed
-      serial_println @right_motor_speed
     end
     if current_rudder_direction == 'r'
       @left_motor_speed = current_throttle_speed / 100.0 * 127.0
       @right_motor_speed = adjusted_throttle_speed / 10000
-      serial_println @left_motor_speed
-      serial_println @right_motor_speed
     end
   end
   
