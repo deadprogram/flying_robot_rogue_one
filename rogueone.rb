@@ -18,9 +18,11 @@ class Rogueone < ArduinoSketch
   @forward = "1, byte"
   @reverse = "0, byte"
   @direction = "1, byte"
-  @left_motor_speed = "0, byte"
-  @right_motor_speed = "0, byte"
+  @left_motor_speed = "0, long"
+  @right_motor_speed = "0, long"
   @deflection = "0, byte"
+  @deflection_percent = "0, long"
+  @deflection_val = "0, long"
     
   output_pin 13, :as => :led
   
@@ -86,7 +88,7 @@ class Rogueone < ArduinoSketch
   end
   
   def set_thrusters
-    if current_command_direction == 'f'
+    if current_throttle_direction == 'f'
       @direction = @forward
     else
       @direction = @reverse
@@ -100,20 +102,29 @@ class Rogueone < ArduinoSketch
   
   def calculate_motor_speeds
     if current_rudder_direction == 'c'
-      @left_motor_speed = current_throttle_speed / 100.0 * 127
-      @right_motor_speed = current_throttle_speed / 100.0 * 127
+      @left_motor_speed = current_throttle_speed / 100.0 * 127.0
+      @right_motor_speed = current_throttle_speed / 100.0 * 127.0
+      serial_println @left_motor_speed
+      serial_println @right_motor_speed
     end
     if current_rudder_direction == 'l'
-      @left_motor_speed = adjusted_throttle_speed / 100.0 * 127
-      @right_motor_speed = current_throttle_speed / 100.0 * 127
+      @left_motor_speed = adjusted_throttle_speed / 10000
+      @right_motor_speed = current_throttle_speed / 100.0 * 127.0
+      serial_println @left_motor_speed
+      serial_println @right_motor_speed
     end
     if current_rudder_direction == 'r'
-      @left_motor_speed = current_throttle_speed / 100.0 * 127
-      @right_motor_speed = adjusted_throttle_speed / 100.0 * 127
+      @left_motor_speed = current_throttle_speed / 100.0 * 127.0
+      @right_motor_speed = adjusted_throttle_speed / 10000
+      serial_println @left_motor_speed
+      serial_println @right_motor_speed
     end
   end
   
   def adjusted_throttle_speed
-    return (current_rudder_deflection / 90.0) * current_throttle_speed ;
+    #return (1.0 - (current_rudder_deflection / 90.0)) * current_throttle_speed
+    @deflection_percent = (current_rudder_deflection * 100 / 90)
+    @deflection_val = 100 - @deflection_percent
+    return @deflection_val * current_throttle_speed * 127
   end
 end
