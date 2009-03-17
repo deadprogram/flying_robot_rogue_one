@@ -15,15 +15,16 @@ class Battery < ArduinoPlugin
   add_to_setup "battery_init_completed = false;"
   
   # bogus function here to make RAD happy
-  void battery_test() {}
+  void battery_test() {
+  }
 
-  # initialize the battery reading
+  // initialize the battery reading
   void init_battery(int pin) {
     average_battery = analogRead(pin);
   }
 
-  # get the current voltage
-  # TODO: allow user to set constants for different expected battery voltages
+  // get the current voltage
+  // TODO: allow user to set constants for different expected battery voltages
   float voltage(int pin)
   {
     if (! battery_init_completed) {
