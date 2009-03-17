@@ -116,7 +116,6 @@ class Rogueone < ArduinoSketch
   end
   
   def adjusted_throttle_speed
-    #return (1.0 - (current_rudder_deflection / 90.0)) * current_throttle_speed
     @deflection_percent = (current_rudder_deflection * 100 / 90)
     @deflection_val = 100 - @deflection_percent
     return @deflection_val * current_throttle_speed * 127
