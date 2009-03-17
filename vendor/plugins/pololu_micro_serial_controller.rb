@@ -21,6 +21,7 @@ class PololuMicroSerialController < ArduinoPlugin
     mc_init_complete = true ;
       
     // start up motor controller
+    digitalWrite(motor_controller_reset_pin, LOW);
     digitalWrite(motor_controller_reset_pin, HIGH);
 
     // let motor controller wake up
