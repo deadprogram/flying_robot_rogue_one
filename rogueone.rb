@@ -23,8 +23,12 @@ class Rogueone < ArduinoSketch
   @deflection = "0, byte"
   @deflection_percent = "0, long"
   @deflection_val = "0, long"
-    
+  
+  # just to make something blink  
   output_pin 13, :as => :led
+  
+  # read battery voltage, to protect our expensive LiPo from going below minimum power.
+  input_pin 0, :as => :battery
   
   # xbee used for communication with ground station
   serial_begin :rate => 19200
@@ -32,6 +36,8 @@ class Rogueone < ArduinoSketch
   # main command loop, required for any arduino program
   def loop
     be_flying_robot
+    battery_test
+    
     process_command
     servo_refresh
   end
@@ -79,12 +85,12 @@ class Rogueone < ArduinoSketch
   end
     
   def instruments
-    prepare_compass
-    read_compass
-    serial_print "Instruments command - compass heading:"
-    serial_print heading
-    serial_print "."
-    serial_println heading_fractional
+    if current_command_instrument == 'b'
+      check_battery_voltage
+    end
+    if current_command_instrument == 'c'
+      check_compass
+    end
   end
   
   def set_thrusters
@@ -119,5 +125,19 @@ class Rogueone < ArduinoSketch
     @deflection_percent = (current_rudder_deflection * 100 / 90)
     @deflection_val = 100 - @deflection_percent
     return @deflection_val * current_throttle_speed * 127
+  end
+  
+  def check_compass
+    prepare_compass
+    read_compass
+    serial_print "Instruments command - compass heading:"
+    serial_print heading
+    serial_print "."
+    serial_println heading_fractional
+  end
+  
+  def check_battery_voltage
+    serial_print "Battery voltage: "
+    serial_println int(battery.voltage)
   end
 end
