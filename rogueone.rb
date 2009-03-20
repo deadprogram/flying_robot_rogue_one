@@ -11,6 +11,7 @@ class Rogueone < ArduinoSketch
   output_pin 11, :as => :vectoring_servo, :device => :servo
   
   # softwareserial interface for pololu micro serial controller used for main thrusters
+  define "MAX_SPEED 25"
   software_serial 10, 3, :as => :main_thrusters
   output_pin 4, :as => :main_thrusters_reset
   @left_motor = "2, byte"
@@ -108,15 +109,15 @@ class Rogueone < ArduinoSketch
   
   def calculate_motor_speeds
     if current_rudder_direction == 'c'
-      @left_motor_speed = current_throttle_speed / 100.0 * 127.0
-      @right_motor_speed = current_throttle_speed / 100.0 * 127.0
+      @left_motor_speed = current_throttle_speed / 100.0 * MAX_SPEED
+      @right_motor_speed = current_throttle_speed / 100.0 * MAX_SPEED
     end
     if current_rudder_direction == 'l'
       @left_motor_speed = adjusted_throttle_speed / 10000
-      @right_motor_speed = current_throttle_speed / 100.0 * 127.0
+      @right_motor_speed = current_throttle_speed / 100.0 * MAX_SPEED
     end
     if current_rudder_direction == 'r'
-      @left_motor_speed = current_throttle_speed / 100.0 * 127.0
+      @left_motor_speed = current_throttle_speed / 100.0 * MAX_SPEED
       @right_motor_speed = adjusted_throttle_speed / 10000
     end
   end
@@ -124,7 +125,7 @@ class Rogueone < ArduinoSketch
   def adjusted_throttle_speed
     @deflection_percent = (current_rudder_deflection * 100 / 90)
     @deflection_val = 100 - @deflection_percent
-    return @deflection_val * current_throttle_speed * 127
+    return @deflection_val * current_throttle_speed * MAX_SPEED
   end
   
   def check_compass
