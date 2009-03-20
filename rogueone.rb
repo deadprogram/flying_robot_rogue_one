@@ -43,13 +43,15 @@ class Rogueone < ArduinoSketch
     servo_refresh
   end
 
-  # flying robot interface, implement these for your own hardware set
+  # flying robot interface methods
   def hail
     serial_println "Roger"
   end
   
   def status
     serial_println "Status: operational"
+    check_battery_voltage
+    check_compass
   end
   
   def elevators
@@ -94,6 +96,7 @@ class Rogueone < ArduinoSketch
     end
   end
   
+  # motor control
   def set_thrusters
     if current_throttle_direction == 'f'
       @direction = @forward
@@ -128,17 +131,19 @@ class Rogueone < ArduinoSketch
     return @deflection_val * current_throttle_speed * MAX_SPEED
   end
   
+  # instruments
+  def check_battery_voltage
+    serial_print "Battery voltage: "
+    serial_println int(battery.voltage)
+  end
+
   def check_compass
     prepare_compass
     read_compass
-    serial_print "Instruments command - compass heading:"
+    serial_print "Compass heading: "
     serial_print heading
     serial_print "."
     serial_println heading_fractional
   end
   
-  def check_battery_voltage
-    serial_print "Battery voltage: "
-    serial_println int(battery.voltage)
-  end
 end
