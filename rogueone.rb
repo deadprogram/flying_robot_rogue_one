@@ -31,6 +31,12 @@ class Rogueone < ArduinoSketch
   # read battery voltage, to protect our expensive LiPo from going below minimum power.
   input_pin 0, :as => :battery
   
+  # test for IR
+  input_pin 9, :as => :ir_front
+  input_pin 6, :as => :ir_right
+  input_pin 7, :as => :ir_rear
+  input_pin 8, :as => :ir_left  
+   
   # xbee used for communication with ground station
   serial_begin :rate => 19200
   
@@ -38,6 +44,7 @@ class Rogueone < ArduinoSketch
   def loop
     be_flying_robot
     battery_test
+    read_ir_receiver(9, 6, 7, 8)
     
     process_command
     servo_refresh
@@ -94,6 +101,9 @@ class Rogueone < ArduinoSketch
     if current_command_instrument == 'c'
       check_compass
     end
+    if current_command_instrument == 'i'
+      check_ir
+    end
   end
   
   # motor control
@@ -146,4 +156,32 @@ class Rogueone < ArduinoSketch
     serial_println heading_fractional
   end
   
+  def check_ir
+    ir_count_front = 0
+    ir_count_right = 0
+    ir_count_back = 0
+    ir_count_left = 0
+    
+    5000.times do
+      if (digitalRead(ir_front) == LOW)
+        ir_count_front = ir_count_front + 1
+      end
+      if (digitalRead(ir_right) == LOW)
+        ir_count_right = ir_count_right + 1
+      end
+      if (digitalRead(ir_rear) == LOW)
+        ir_count_back = ir_count_back + 1
+      end
+      if (digitalRead(ir_left) == LOW)
+        ir_count_left = ir_count_left + 1
+      end
+    end
+    
+    serial_print "IR: "
+    serial_println ir_count_front
+    serial_println ir_count_right
+    serial_println ir_count_back
+    serial_println ir_count_left
+    
+  end
 end
