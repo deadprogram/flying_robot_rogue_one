@@ -44,7 +44,6 @@ class Rogueone < ArduinoSketch
   def loop
     be_flying_robot
     battery_test
-    read_ir_receiver(9, 6, 7, 8)
     
     process_command
     servo_refresh
@@ -156,32 +155,8 @@ class Rogueone < ArduinoSketch
     serial_println heading_fractional
   end
   
-  def check_ir
-    ir_count_front = 0
-    ir_count_right = 0
-    ir_count_back = 0
-    ir_count_left = 0
-    
-    5000.times do
-      if (digitalRead(ir_front) == LOW)
-        ir_count_front = ir_count_front + 1
-      end
-      if (digitalRead(ir_right) == LOW)
-        ir_count_right = ir_count_right + 1
-      end
-      if (digitalRead(ir_rear) == LOW)
-        ir_count_back = ir_count_back + 1
-      end
-      if (digitalRead(ir_left) == LOW)
-        ir_count_left = ir_count_left + 1
-      end
-    end
-    
+  def check_ir   
     serial_print "IR: "
-    serial_println ir_count_front
-    serial_println ir_count_right
-    serial_println ir_count_back
-    serial_println ir_count_left
-    
+    serial_println read_ir_receiver(ir_front, ir_right, ir_rear, ir_left)
   end
 end
