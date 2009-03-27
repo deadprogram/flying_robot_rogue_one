@@ -11,7 +11,7 @@ class Rogueone < ArduinoSketch
   output_pin 11, :as => :vectoring_servo, :device => :servo
   
   # softwareserial interface for pololu micro serial controller used for main thrusters
-  define "MAX_SPEED 25"
+  define "MAX_SPEED 127"
   software_serial 10, 3, :as => :main_thrusters
   output_pin 4, :as => :main_thrusters_reset
   @left_motor = "2, byte"
