@@ -12,7 +12,7 @@ class Rogueone < ArduinoSketch
   
   # softwareserial interface for pololu micro serial controller used for main thrusters
   define "MAX_SPEED 127"
-  software_serial 10, 3, :as => :main_thrusters
+  software_serial 10, 3, :as => :main_thrusters, :rate => 38400
   output_pin 4, :as => :main_thrusters_reset
   @left_motor = "2, byte"
   @right_motor = "3, byte"
@@ -114,9 +114,9 @@ class Rogueone < ArduinoSketch
     end
     
     calculate_motor_speeds
-    main_thrusters_reset.mc_init
-    main_thrusters.mc_send_command(@left_motor, @direction, @left_motor_speed)
-    main_thrusters.mc_send_command(@right_motor, @direction, @right_motor_speed)
+    main_thrusters_reset.qik_init(main_thrusters)
+    main_thrusters.qik_send_command(@left_motor, @direction, @left_motor_speed)
+    main_thrusters.qik_send_command(@right_motor, @direction, @right_motor_speed)
   end
   
   def calculate_motor_speeds

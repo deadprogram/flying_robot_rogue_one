@@ -2,7 +2,7 @@
 # Written by Ron Evans (http://deadprogrammersociety.com) for the flying_robot project
 #
 # Based on code taken from the Pololu forums: http://forum.pololu.com/viewtopic.php?f=15&t=1102&p=4913&hilit=arduino#p4913
-class PololuMicroSerialController < ArduinoPlugin
+class PololuQikDualSerialMotorController < ArduinoPlugin
   plugin_directives "#define LEFT_MOTOR  2"
   plugin_directives "#define RIGHT_MOTOR 3"
   
@@ -12,7 +12,7 @@ class PololuMicroSerialController < ArduinoPlugin
   external_variables "bool mc_init_complete"
   add_to_setup "mc_init_complete = false;"
 
-  void pmsc_init(int motor_controller_reset_pin)
+  void qik_init(int motor_controller_reset_pin, SoftwareSerial& motor_controller)
   {
     if (mc_init_complete) {
       return ;
@@ -27,17 +27,34 @@ class PololuMicroSerialController < ArduinoPlugin
 
     // let motor controller wake up
     delay(100);
+    
+    // allow Pololu auto-baud rate detection to kick in
+    // motor_controller.print(0xAA);
   }
 
-  void pmsc_send_command(SoftwareSerial& motor_controller, byte motor, byte direction, byte speed)
+  void qik_send_command(SoftwareSerial& motor_controller, byte motor, byte direction, byte speed)
   {
     unsigned char mc_command[4];
     direction = constrain(direction, 0,   1);
     speed     = constrain(speed,   0, 127);
 
-    mc_command[0] = 0x80; // start byte
-    mc_command[1] = 0x00; // Device type byte
-    mc_command[2] = (2 * motor) + (direction == FORWARD ? FORWARD : REVERSE); // Motor number and direction byte
+    mc_command[0] = 0xAA;
+    mc_command[1] = 0x09;
+    
+    if (motor == LEFT_MOTOR) {
+      if (direction == FORWARD) {
+        mc_command[2] = 0x88; // M0 forward
+      } else {
+        mc_command[2] = 0x8A; // M0 reverse
+      }
+    } else {
+      if (direction == FORWARD) {
+        mc_command[2] = 0x8C; // M1 forward
+      } else {
+        mc_command[2] = 0x8E; // M2 reverse
+      }
+    }
+
     mc_command[3] = speed; // Motor speed (0 to 127)
 
     // send data
