@@ -1,5 +1,8 @@
-# Plugin for Ruby Arduino Development that allows use of the Pololu micro serial controller
+# Plugin for Ruby Arduino Development that allows use of the Pololu micro dual serial motor controller
 # Written by Ron Evans (http://deadprogrammersociety.com) for the flying_robot project
+#
+# This is the device this plugin works with:
+#   http://www.pololu.com/catalog/product/410
 #
 # Based on code taken from the Pololu forums: http://forum.pololu.com/viewtopic.php?f=15&t=1102&p=4913&hilit=arduino#p4913
 class PololuMicroSerialController < ArduinoPlugin
