@@ -7,7 +7,9 @@ class PololuIrReceiver < ArduinoPlugin
   external_variables "int ir_count[4]"
   external_variables "int ir_best_reading = 0"
   external_variables "int ir_beacon_direction = 0"
-  
+  external_variables "int ir_beacon_refresh_rate = 500"
+  external_variables "int ir_beacon_last_reading_time = 0"
+    
   void reset_ir_receiver() {
     ir_count[0] = 0 ;
     ir_count[1] = 0 ;
