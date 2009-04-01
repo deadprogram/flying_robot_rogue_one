@@ -19,6 +19,8 @@
 # (i)nstruments - Read the current data for one of the installed instruments on the UAV. This command supports one parameter:
 #   id - enter an integer for which instrment readings should be returned from. If there is not an instrument installed
 #        for that id 'Invalid instrument' will be returned
+# (a)utopilot - Engage whatever autopilot is available, if any. This command supports one parameter:
+#   program - enter an integer for which autopilot routine should be used. Enter 0 to cancel autopilot
 #
 class FlyingRobot < ArduinoPlugin
   # used for parsing input commands
@@ -30,6 +32,7 @@ class FlyingRobot < ArduinoPlugin
   external_variables "char command_code[1]"
   external_variables "char direction_code[1]"
   external_variables "char instrument_code[1]"
+  external_variables "char autopilot_code[1]"
   external_variables "int command_value"
     
   # current elevator values
@@ -43,9 +46,12 @@ class FlyingRobot < ArduinoPlugin
   # current throttle values
   external_variables "char throttle_direction[1]"
   external_variables "int throttle_speed = 0"
+  
+  # autopilot
+  external_variables "bool autopilot_engaged"
     
   # initialize parser vars
-  add_to_setup "current_command_received_complete = false; elevator_direction[0] = 'c'; rudder_direction[0] = 'c'; throttle_direction[0] = 'f';"
+  add_to_setup "current_command_received_complete = false; elevator_direction[0] = 'c'; rudder_direction[0] = 'c'; throttle_direction[0] = 'f'; autopilot_engaged = false;"
   
   # this is a hack to get the plugin included, that I got from the twitter_connect example
   void be_flying_robot(){}
@@ -64,6 +70,10 @@ class FlyingRobot < ArduinoPlugin
 
   char current_command_instrument() {
     return instrument_code[0];
+  }
+
+  char current_command_autopilot() {
+    return autopilot_code[0];
   }
   
   int current_command_value() {
@@ -92,6 +102,18 @@ class FlyingRobot < ArduinoPlugin
   
   int current_throttle_speed() {
     return throttle_speed ;
+  }
+  
+  boolean is_autopilot_on() {
+    return autopilot_engaged == true ;
+  }
+  
+  void autopilot_on() {
+    autopilot_engaged = true;
+  }
+
+  void autopilot_off() {
+    autopilot_engaged = false;
   }
   
   void clear_command_buffer() {
@@ -127,6 +149,14 @@ class FlyingRobot < ArduinoPlugin
       instrument_code[0] = command_buffer[2];
     } else {
       instrument_code[0] = 0;
+    }
+  }
+
+  void parse_autopilot_code() {
+    if(current_command_length >= 3) {
+      autopilot_code[0] = command_buffer[2];
+    } else {
+      autopilot_code[0] = 0;
     }
   }
 
@@ -208,6 +238,13 @@ class FlyingRobot < ArduinoPlugin
     } else if (cmd == 'i') {    
       parse_instrument_code();
       instruments();
+    } else if (cmd == 'a') {    
+      parse_autopilot_code();
+      if (autopilot_code[0] == '0') {
+        autopilot_off();
+      }
+        
+      autopilot();
     } else {    
       Serial.println("Invalid command");
     }    

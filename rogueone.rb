@@ -24,6 +24,8 @@ class Rogueone < ArduinoSketch
   @deflection = "0, byte"
   @deflection_percent = "0, long"
   @deflection_val = "0, long"
+  @autopilot_update_frequency = "500, int"
+  @last_autopilot_update = "0, int"
   
   # just to make something blink  
   output_pin 13, :as => :led
@@ -31,11 +33,11 @@ class Rogueone < ArduinoSketch
   # read battery voltage, to protect our expensive LiPo from going below minimum power.
   input_pin 0, :as => :battery
   
-  # test for IR
-  input_pin 9, :as => :ir_front
-  input_pin 6, :as => :ir_right
-  input_pin 7, :as => :ir_rear
-  input_pin 8, :as => :ir_left  
+  # test for IR beacon
+  input_pin 6, :as => :ir_front
+  input_pin 7, :as => :ir_right
+  input_pin 8, :as => :ir_rear
+  input_pin 9, :as => :ir_left  
    
   # xbee used for communication with ground station
   serial_begin :rate => 19200
@@ -44,6 +46,7 @@ class Rogueone < ArduinoSketch
   def loop
     be_flying_robot
     battery_test
+    handle_autopilot_update
     
     process_command
     servo_refresh
@@ -103,6 +106,34 @@ class Rogueone < ArduinoSketch
     if current_command_instrument == 'i'
       check_ir
     end
+  end
+  
+  def autopilot
+    if current_command_autopilot == '0'
+      # autopilot cancel, so we should shutoff motors
+      throttle_speed = 0
+      set_thrusters
+      serial_println "Autopilot Is Off"
+    end
+    
+    if current_command_autopilot == '1'
+      # follow IR beacon
+      autopilot_on
+      serial_println "Autopilot Is On"
+    end
+  end
+  
+  def handle_autopilot_update
+    #if (is_autopilot_on) 
+      if is_autopilot_on && millis() - @last_autopilot_update > @autopilot_update_frequency
+        if current_command_autopilot == '1'
+          check_ir
+        end
+      
+        serial_println "Autopilot update"
+        @last_autopilot_update = millis()
+      end
+    #end
   end
   
   # motor control
