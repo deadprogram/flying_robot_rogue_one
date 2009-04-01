@@ -19,6 +19,8 @@ class Rogueone < ArduinoSketch
   @forward = "1, byte"
   @reverse = "0, byte"
   @direction = "1, byte"
+  @left_direction = "1, byte"
+  @right_direction = "1, byte"
   @left_motor_speed = "0, long"
   @right_motor_speed = "0, long"
   @deflection = "0, byte"
@@ -46,6 +48,7 @@ class Rogueone < ArduinoSketch
   def loop
     be_flying_robot
     battery_test
+    update_ir_receiver(ir_front, ir_right, ir_rear, ir_left)
     handle_autopilot_update
     
     process_command
@@ -124,30 +127,67 @@ class Rogueone < ArduinoSketch
   end
   
   def handle_autopilot_update
-    #if (is_autopilot_on) 
-      if is_autopilot_on && millis() - @last_autopilot_update > @autopilot_update_frequency
-        if current_command_autopilot == '1'
-          check_ir
+    if is_autopilot_on && millis() - @last_autopilot_update > @autopilot_update_frequency
+      if current_command_autopilot == '1'
+        if current_ir_beacon_direction == 0
+          @left_motor_speed = 0
+          @right_motor_speed = 0
+          @left_direction = @forward
+          @right_direction = @forward
         end
-      
-        serial_println "Autopilot update"
-        @last_autopilot_update = millis()
+        if current_ir_beacon_direction == 1
+          @left_motor_speed = 0
+          @right_motor_speed = 0
+          @left_direction = @forward
+          @right_direction = @forward
+        end
+        if current_ir_beacon_direction == 2
+          @left_motor_speed = MAX_SPEED / 10
+          @left_direction = @forward
+          
+          @right_motor_speed = MAX_SPEED / 10
+          @right_direction = @reverse
+        end
+        if current_ir_beacon_direction == 3
+          @left_motor_speed = MAX_SPEED / 10
+          @left_direction = @forward
+          
+          @right_motor_speed = MAX_SPEED / 10
+          @right_direction = @reverse
+        end
+        if current_ir_beacon_direction == 4
+          @left_motor_speed = MAX_SPEED / 10
+          @left_direction = @forward
+          
+          @right_motor_speed = MAX_SPEED / 10
+          @right_direction = @reverse
+        end
+        
+        activate_thrusters
       end
-    #end
+    
+      @last_autopilot_update = millis()
+    end
   end
   
   # motor control
   def set_thrusters
     if current_throttle_direction == 'f'
-      @direction = @forward
+      @left_direction = @forward
+      @right_direction = @forward
     else
-      @direction = @reverse
+      @left_direction = @reverse
+      @right_direction = @reverse
     end
     
     calculate_motor_speeds
+    activate_thrusters
+  end
+  
+  def activate_thrusters
     main_thrusters_reset.qik_init(main_thrusters)
-    main_thrusters.qik_send_command(@left_motor, @direction, @left_motor_speed)
-    main_thrusters.qik_send_command(@right_motor, @direction, @right_motor_speed)
+    main_thrusters.qik_send_command(@left_motor, @left_direction, @left_motor_speed)
+    main_thrusters.qik_send_command(@right_motor, @right_direction, @right_motor_speed)
   end
   
   def calculate_motor_speeds
@@ -188,6 +228,6 @@ class Rogueone < ArduinoSketch
   
   def check_ir   
     serial_print "IR: "
-    serial_println read_ir_receiver(ir_front, ir_right, ir_rear, ir_left)
+    serial_println current_ir_beacon_direction
   end
 end
