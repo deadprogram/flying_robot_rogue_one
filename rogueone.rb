@@ -26,8 +26,8 @@ class Rogueone < ArduinoSketch
   @deflection = "0, byte"
   @deflection_percent = "0, long"
   @deflection_val = "0, long"
-  @autopilot_update_frequency = "500, int"
-  @last_autopilot_update = "0, int"
+  @autopilot_update_frequency = "500, unsigned long"
+  @last_autopilot_update = "0, unsigned long"
   
   # just to make something blink  
   output_pin 13, :as => :led
@@ -157,10 +157,10 @@ class Rogueone < ArduinoSketch
         end
         if current_ir_beacon_direction == 4
           @left_motor_speed = MAX_SPEED / 10
-          @left_direction = @forward
+          @left_direction = @reverse
           
           @right_motor_speed = MAX_SPEED / 10
-          @right_direction = @reverse
+          @right_direction = @forward
         end
         
         activate_thrusters
