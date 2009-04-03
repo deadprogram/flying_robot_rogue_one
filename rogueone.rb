@@ -35,12 +35,6 @@ class Rogueone < ArduinoSketch
   # read battery voltage, to protect our expensive LiPo from going below minimum power.
   input_pin 0, :as => :battery
   
-  # test for IR beacon
-  input_pin 6, :as => :ir_front
-  input_pin 7, :as => :ir_right
-  input_pin 8, :as => :ir_rear
-  input_pin 9, :as => :ir_left  
-   
   # xbee used for communication with ground station
   serial_begin :rate => 19200
   
@@ -48,7 +42,6 @@ class Rogueone < ArduinoSketch
   def loop
     be_flying_robot
     battery_test
-    update_ir_receiver(ir_front, ir_right, ir_rear, ir_left)
     handle_autopilot_update
     
     process_command
@@ -106,9 +99,6 @@ class Rogueone < ArduinoSketch
     if current_command_instrument == 'c'
       check_compass
     end
-    if current_command_instrument == 'i'
-      check_ir
-    end
   end
   
   def autopilot
@@ -129,41 +119,7 @@ class Rogueone < ArduinoSketch
   def handle_autopilot_update
     if is_autopilot_on && millis() - @last_autopilot_update > @autopilot_update_frequency
       if current_command_autopilot == '1'
-        if current_ir_beacon_direction == 0
-          @left_motor_speed = 0
-          @right_motor_speed = 0
-          @left_direction = @forward
-          @right_direction = @forward
-        end
-        if current_ir_beacon_direction == 1
-          @left_motor_speed = 0
-          @right_motor_speed = 0
-          @left_direction = @forward
-          @right_direction = @forward
-        end
-        if current_ir_beacon_direction == 2
-          @left_motor_speed = MAX_SPEED / 10
-          @left_direction = @forward
-          
-          @right_motor_speed = MAX_SPEED / 10
-          @right_direction = @reverse
-        end
-        if current_ir_beacon_direction == 3
-          @left_motor_speed = MAX_SPEED / 10
-          @left_direction = @forward
-          
-          @right_motor_speed = MAX_SPEED / 10
-          @right_direction = @reverse
-        end
-        if current_ir_beacon_direction == 4
-          @left_motor_speed = MAX_SPEED / 10
-          @left_direction = @reverse
-          
-          @right_motor_speed = MAX_SPEED / 10
-          @right_direction = @forward
-        end
-        
-        activate_thrusters
+        autopilot_on
       end
     
       @last_autopilot_update = millis()
@@ -196,12 +152,34 @@ class Rogueone < ArduinoSketch
       @right_motor_speed = current_throttle_speed / 100.0 * MAX_SPEED
     end
     if current_rudder_direction == 'l'
-      @left_motor_speed = adjusted_throttle_speed / 10000
-      @right_motor_speed = current_throttle_speed / 100.0 * MAX_SPEED
+      if current_rudder_deflection >= 45
+        if (current_throttle_direction == 'f')
+          @left_direction = @reverse
+        else
+          @left_direction = @forward
+        end
+                
+        @left_motor_speed = hard_turn_throttle_speed / 10000
+        @right_motor_speed = current_throttle_speed / 100.0 * MAX_SPEED
+      else
+        @left_motor_speed = adjusted_throttle_speed / 10000
+        @right_motor_speed = current_throttle_speed / 100.0 * MAX_SPEED
+      end
     end
     if current_rudder_direction == 'r'
-      @left_motor_speed = current_throttle_speed / 100.0 * MAX_SPEED
-      @right_motor_speed = adjusted_throttle_speed / 10000
+      if current_rudder_deflection >= 45
+        if (current_throttle_direction == 'f')
+          @right_direction = @reverse
+        else
+          @right_direction = @forward
+        end
+                
+        @left_motor_speed = current_throttle_speed / 100.0 * MAX_SPEED
+        @right_motor_speed = hard_turn_throttle_speed / 10000
+      else
+        @left_motor_speed = current_throttle_speed / 100.0 * MAX_SPEED
+        @right_motor_speed = adjusted_throttle_speed / 10000
+      end
     end
   end
   
@@ -209,6 +187,11 @@ class Rogueone < ArduinoSketch
     @deflection_percent = (current_rudder_deflection * 100 / 90)
     @deflection_val = 100 - @deflection_percent
     return @deflection_val * current_throttle_speed * MAX_SPEED
+  end
+  
+  def hard_turn_throttle_speed
+    @deflection_percent = (current_rudder_deflection * 100 / 90)
+    return @deflection_percent * current_throttle_speed * MAX_SPEED
   end
   
   # instruments
@@ -226,8 +209,4 @@ class Rogueone < ArduinoSketch
     serial_println heading_fractional
   end
   
-  def check_ir   
-    serial_print "IR: "
-    serial_println current_ir_beacon_direction
-  end
 end
