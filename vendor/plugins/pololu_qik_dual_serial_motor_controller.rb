@@ -31,8 +31,21 @@ class PololuQikDualSerialMotorController < ArduinoPlugin
     // let motor controller wake up
     delay(100);
     
-    // allow Pololu auto-baud rate detection to kick in
-    // motor_controller.print(0xAA);
+    // set Pololu auto-disable if no motor command received for 
+    unsigned char mc_command[7];
+    mc_command[0] = 0xAA; // start command
+    mc_command[1] = 0x09; // device number
+    mc_command[2] = 0x04; // set configuration parameter 
+    mc_command[3] = 0x03; // serial timeout
+    mc_command[4] = 0x3E; // should be 29.3 seconds
+    mc_command[5] = 0x55; // command terminator
+    mc_command[6] = 0x2A; // end command
+    
+    // send data
+    for(int i = 0; i < 7; i++)
+    { motor_controller.print(mc_command[i], BYTE); }
+    
+    delay(10);
   }
 
   void qik_send_command(SoftwareSerial& motor_controller, byte motor, byte direction, byte speed)
