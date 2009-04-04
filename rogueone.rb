@@ -119,7 +119,58 @@ class Rogueone < ArduinoSketch
   def handle_autopilot_update
     if is_autopilot_on && millis() - @last_autopilot_update > @autopilot_update_frequency
       if current_command_autopilot == '1'
-        autopilot_on
+        get_compass
+        
+        if heading <= 330 && heading >= 30
+          # turn left 
+          @left_direction = @forward
+          @right_direction = @forward
+          @left_motor_speed = 0
+          @right_motor_speed = 0
+          
+          activate_thrusters
+        end
+
+        if heading < 330 && heading >= 270
+          # turn right
+          @left_direction = @forward
+          @right_direction = @reverse
+          @left_motor_speed = 6
+          @right_motor_speed = 6
+          
+          activate_thrusters
+        end
+
+        if heading < 270 && heading >= 180
+          # turn right
+          @left_direction = @forward
+          @right_direction = @reverse
+          @left_motor_speed = 8
+          @right_motor_speed = 8
+          
+          activate_thrusters
+        end
+
+        if heading < 180 && heading > 90
+          # turn left 
+          @left_direction = @reverse
+          @right_direction = @forward
+          @left_motor_speed = 8
+          @right_motor_speed = 8
+          
+          activate_thrusters
+        end
+
+        if heading <= 90 && heading > 30
+          # turn left 
+          @left_direction = @reverse
+          @right_direction = @forward
+          @left_motor_speed = 6
+          @right_motor_speed = 6
+          
+          activate_thrusters
+        end
+        
       end
     
       @last_autopilot_update = millis()
@@ -200,9 +251,13 @@ class Rogueone < ArduinoSketch
     serial_println int(battery.voltage)
   end
 
-  def check_compass
+  def get_compass
     prepare_compass
     read_compass
+  end
+
+  def check_compass
+    get_compass
     serial_print "Compass heading: "
     serial_print heading
     serial_print "."
