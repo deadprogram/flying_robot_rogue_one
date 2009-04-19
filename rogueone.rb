@@ -36,7 +36,7 @@ class Rogueone < ArduinoSketch
   input_pin 0, :as => :battery
   
   # xbee used for communication with ground station
-  serial_begin :rate => 19200
+  serial_begin :rate => 57600
   
   # main command loop, required for any arduino program
   def loop
