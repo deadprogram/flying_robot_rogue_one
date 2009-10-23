@@ -36,7 +36,7 @@ class Rogueone < ArduinoSketch
   input_pin 0, :as => :battery
   
   # xbee used for communication with ground station
-  serial_begin :rate => 57600
+  serial_begin :rate => 19200
   
   # main command loop, required for any arduino program
   def loop
@@ -247,7 +247,7 @@ class Rogueone < ArduinoSketch
   
   # instruments
   def check_battery_voltage
-    serial_print "Battery voltage: "
+    serial_print "Battery: "
     serial_println int(battery.voltage)
   end
 
@@ -258,7 +258,7 @@ class Rogueone < ArduinoSketch
 
   def check_compass
     get_compass
-    serial_print "Compass heading: "
+    serial_print "Compass: "
     serial_print heading
     serial_print "."
     serial_println heading_fractional
