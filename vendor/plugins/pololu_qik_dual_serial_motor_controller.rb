@@ -31,13 +31,13 @@ class PololuQikDualSerialMotorController < ArduinoPlugin
     // let motor controller wake up
     delay(100);
     
-    // set Pololu auto-disable if no motor command received for 
+    // turn off Pololu auto-disable on errors
     unsigned char mc_command[7];
     mc_command[0] = 0xAA; // start command
     mc_command[1] = 0x09; // device number
     mc_command[2] = 0x04; // set configuration parameter 
-    mc_command[3] = 0x03; // serial timeout
-    mc_command[4] = 0x3E; // should be 29.3 seconds
+    mc_command[3] = 0x02; // Shutdown Motors on Error
+    mc_command[4] = 0x00; // do not shutdown
     mc_command[5] = 0x55; // command terminator
     mc_command[6] = 0x2A; // end command
     

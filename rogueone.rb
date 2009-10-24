@@ -203,7 +203,7 @@ class Rogueone < ArduinoSketch
       @right_motor_speed = current_throttle_speed / 100.0 * MAX_SPEED
     end
     if current_rudder_direction == 'l'
-      if current_rudder_deflection >= 45
+      if current_rudder_deflection > 45
         if (current_throttle_direction == 'f')
           @left_direction = @reverse
         else
@@ -218,7 +218,7 @@ class Rogueone < ArduinoSketch
       end
     end
     if current_rudder_direction == 'r'
-      if current_rudder_deflection >= 45
+      if current_rudder_deflection > 45
         if (current_throttle_direction == 'f')
           @right_direction = @reverse
         else
@@ -235,7 +235,7 @@ class Rogueone < ArduinoSketch
   end
   
   def adjusted_throttle_speed
-    @deflection_percent = (current_rudder_deflection * 100 / 90)
+    @deflection_percent = (current_rudder_deflection * 100 / 45)
     @deflection_val = 100 - @deflection_percent
     return @deflection_val * current_throttle_speed * MAX_SPEED
   end
