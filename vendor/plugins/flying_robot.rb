@@ -22,8 +22,8 @@
 # (i)nstruments - Read the current data for one of the installed instruments on the UAV. This command supports one parameter:
 #   id - enter an integer for which instrment readings should be returned from. If there is not an instrument installed
 #        for that id 'Invalid instrument' will be returned
-# auto(p)ilot - Engage whatever autopilot program is available, if any. This command supports one parameter:
-#   program - enter an integer for which autopilot routine should be used. Enter 0 to cancel autopilot
+# (p)rogram - Engage whatever autopilot program is available, if any. This command supports one parameter:
+#   id - enter an integer for which autopilot routine should be used. Enter 0 to cancel autopilot
 #
 class FlyingRobot < ArduinoPlugin
   # used for parsing input commands
