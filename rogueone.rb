@@ -81,6 +81,10 @@ class Rogueone < ArduinoSketch
     servo_refresh
     vectoring_servo.position @deflection
   end
+  
+  def ailerons
+    serial_println "No Ailerons"
+  end
     
   def rudder
     print_current_command("Rudder", current_rudder_deflection)
