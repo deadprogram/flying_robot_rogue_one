@@ -95,6 +95,14 @@ class FlyingRobot < ArduinoPlugin
     return elevator_deflection ;
   }
 
+  char current_aileron_direction() {
+    return aileron_direction[0];
+  }
+  
+  int current_aileron_deflection() {
+    return aileron_deflection ;
+  }
+
   char current_rudder_direction() {
     return rudder_direction[0];
   }
